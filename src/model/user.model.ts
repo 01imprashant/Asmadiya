@@ -16,8 +16,8 @@ const userSchema = new mongoose.Schema({
         trim:true,
     },
     email: {
-        required: true,
         type: String,
+        required: true,
         unique: true,
         lowercase: true,
         trim: true
@@ -28,10 +28,10 @@ const userSchema = new mongoose.Schema({
         minlength:8,
     },
     phone: {
-        type: Number,
+        type: String,
         required: true,
         unique: true,
-        minlength:10
+        maxlength:12
     },
     avatar: {
         type: String, //cloudinary

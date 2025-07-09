@@ -81,18 +81,19 @@ const registerUser = asyncHandler(async(req, res) => {
 
 const logInUser = asyncHandler(async(req, res) => {
     // get user details from frontend
-    const { email, phone, password } = req.body;
+    const { emailOrphone, password } = req.body;
     // validation check - not empty
-    if((!email && !phone) || !password ){
+    if( !emailOrphone || !password ){
         throw new ApiError(400, "email or phone and password is required");
     }
     // find user in db
     const user = await User.findOne({
         $or:[
-            { email },
-            { phone }
+            { email: emailOrphone },
+            { phone: emailOrphone },
         ]
-    })
+    });
+    // if user not found
     if(!user){
         throw new ApiError(401, "user not exist")
     }
