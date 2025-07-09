@@ -29,7 +29,9 @@ const registerUser = asyncHandler(async(req, res) => {
     
     // validation check - not empty
     if(!firstName || !lastName || !email || !password || !phone){
-        throw new ApiError(400, "All fields are required");    
+        return res
+        .status(400)
+        .json(new ApiError(400," ", false, null, "All fields are required"));   
     }
     // check if user already exists - username or email
     const existedUser = await User.findOne({
@@ -40,21 +42,31 @@ const registerUser = asyncHandler(async(req, res) => {
     })
     // if user already present
     if(existedUser){
-        throw new ApiError(409, "User already Exists");
+        // throw new ApiError(409, "User already Exists");
+        return res
+        .status(409)
+        .json(new ApiError(409, "", false, null, "User already Exists"));
+
     }
     const files:any = req.files;
     // check for image, check for avatar
     const avatarLocalPath = files?.avatar?.[0]?.path;
 
     if(!avatarLocalPath){
-        throw new ApiError(400, "Avatar Required");
+        // throw new ApiError(400, "Avatar Required");
+        return res
+        .status(400)
+        .json(new ApiError(400, " ", false, null, "Avatar Required"));
     }
     // upload them to cloudinary, check avatar
     const avatar = await uploadOnCloudinary(avatarLocalPath);
 
     // check if avatar successfully uploaded on cloudinary or not
     if(!avatar){
-        throw new ApiError(400, "Error while uploading avatar");
+        // throw new ApiError(400, "Error while uploading avatar");
+        return res
+        .status(400)
+        .json(new ApiError(400, "", false, null, "Error while uploading avatar"));
     }
     // create user object - create entry in db
     const user = await User.create({
@@ -70,7 +82,10 @@ const registerUser = asyncHandler(async(req, res) => {
     const createdUser = await User.findById(user._id).select("-password")
     // check for user creation
     if(!createdUser){
-        throw new ApiError(500, "Error in Creating User")
+        // throw new ApiError(500, "Error in Creating User");
+        return res
+        .status(500)
+        .json(new ApiError(500, "", false, null, "Error in Creating User"));
     }
     // return response
     return res
@@ -84,7 +99,10 @@ const logInUser = asyncHandler(async(req, res) => {
     const { emailOrphone, password } = req.body;
     // validation check - not empty
     if( !emailOrphone || !password ){
-        throw new ApiError(400, "email or phone and password is required");
+        // throw new ApiError(400, "email or phone and password is required");
+        return res
+        .status(400)
+        .json(new ApiError(400, " ", false, null, "email or phone and password is required"));
     }
     // find user in db
     const user = await User.findOne({
@@ -95,13 +113,19 @@ const logInUser = asyncHandler(async(req, res) => {
     });
     // if user not found
     if(!user){
-        throw new ApiError(401, "user not exist")
+        // throw new ApiError(401, "user not exist")
+        return res
+        .status(401)
+        .json(new ApiError(401, " ", false, null, "user not exist"));
     }
     // check password
     // const isPasswordMatched = await user.comparePassword(password);
     const isPasswordMatched = await bcrypt.compare(password, user.password);
     if(!isPasswordMatched){
-        throw new ApiError(401, "Invalid Password")
+        // throw new ApiError(401, "Invalid Password")
+        return res
+        .status(401)
+        .json(new ApiError(401, " ", false, null, "Invalid Password"));
     }
     // generate accesstoken and refreshtoken
     const accessToken = jwt.sign(
