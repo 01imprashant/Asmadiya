@@ -98,16 +98,11 @@ const logInUser = asyncHandler(async(req, res) => {
     // get user details from frontend
     const { emailOrPhone, password } = req.body;
     // validation check - not empty
-<<<<<<< HEAD
-    if( !emailOrphone || !password ){
+    if( !emailOrPhone || !password ){
         // throw new ApiError(400, "email or phone and password is required");
         return res
         .status(400)
         .json(new ApiError(400, " ", false, null, "email or phone and password is required"));
-=======
-    if( !emailOrPhone || !password ){
-        throw new ApiError(400, "email or phone and password is required");
->>>>>>> 1b0abf6597a9feb6f274823fb66d2e754ce8f7c1
     }
     // find user in db
     const user = await User.findOne({
