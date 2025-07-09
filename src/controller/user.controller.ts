@@ -81,15 +81,16 @@ const registerUser = asyncHandler(async(req, res) => {
 
 const logInUser = asyncHandler(async(req, res) => {
     // get user details from frontend
-    const { email, password } = req.body;
+    const { email, phone, password } = req.body;
     // validation check - not empty
-    if(!email || !password ){
-        throw new ApiError(400, "email and password is required");
+    if((!email && !phone) || !password ){
+        throw new ApiError(400, "email or phone and password is required");
     }
     // find user in db
     const user = await User.findOne({
         $or:[
             { email },
+            { phone }
         ]
     })
     if(!user){
@@ -98,7 +99,6 @@ const logInUser = asyncHandler(async(req, res) => {
     // check password
     // const isPasswordMatched = await user.comparePassword(password);
     const isPasswordMatched = await bcrypt.compare(password, user.password);
-    console.log("isPasswordMatched", isPasswordMatched);
     if(!isPasswordMatched){
         throw new ApiError(401, "Invalid Password")
     }
