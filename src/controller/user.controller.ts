@@ -153,7 +153,46 @@ const logInUser = asyncHandler(async(req, res) => {
     )   
 });
 
+const activeUsersByMonth = asyncHandler(async(req, res) => {
+       // Get the current year
+       const year = new Date().getFullYear();
+       console.log(year)
+
+       // Aggregate users by month of creation
+       const usersByMonth = await User.aggregate([
+           {
+               $match: {
+                   createdAt: {
+                       $gte: new Date(`${year}-01-01T00:00:00.000Z`),
+                       $lt: new Date(`${year + 1}-01-01T00:00:00.000Z`)
+                   }
+               }
+           },
+           {
+               $group: {
+                   _id: { $month: "$createdAt" },
+                   count: { $sum: 1 }
+               }
+           }
+       ]);
+   
+       // Initialize array with 12 zeros (for each month)
+       const monthlyCounts = Array(12).fill(0);
+   
+       // Fill in the counts from aggregation
+       usersByMonth.forEach(item => {
+           // MongoDB months are 1-indexed (Jan=1), JS arrays are 0-indexed
+           monthlyCounts[item._id - 1] = item.count;
+       });
+
+       
+    return res.
+    status(200)
+    .json(new ApiResponse(200, {year: year, monthlyCounts: monthlyCounts}, "Active users year and per month starting from January to December"));
+});
+
 export {
     registerUser,
     logInUser,
+    activeUsersByMonth,
 }
