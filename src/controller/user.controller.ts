@@ -153,6 +153,18 @@ const logInUser = asyncHandler(async(req, res) => {
     )   
 });
 
+const logOutUser = asyncHandler(async(req, res) => {
+    // clear cookies
+    const options = {
+        httpOnly: true,
+        secure: true,
+    }
+    return res
+    .status(200)
+    .cookie("accessToken", "", { ...options, expires: new Date(0) })
+    .json(new ApiResponse(200, null, "User LoggedOut Successfully"))
+});
+
 const activeUsersByMonth = asyncHandler(async(req, res) => {
        // Get the current year
        const year = new Date().getFullYear();
@@ -194,5 +206,6 @@ const activeUsersByMonth = asyncHandler(async(req, res) => {
 export {
     registerUser,
     logInUser,
+    logOutUser,
     activeUsersByMonth,
 }
