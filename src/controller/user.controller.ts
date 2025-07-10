@@ -168,8 +168,6 @@ const logOutUser = asyncHandler(async(req, res) => {
 const activeUsersByMonth = asyncHandler(async(req, res) => {
        // Get the current year
        const year = new Date().getFullYear();
-       console.log(year)
-
        // Aggregate users by month of creation
        const usersByMonth = await User.aggregate([
            {
@@ -200,7 +198,7 @@ const activeUsersByMonth = asyncHandler(async(req, res) => {
        
     return res.
     status(200)
-    .json(new ApiResponse(200, {year: year, monthlyCounts: monthlyCounts}, "Active users year and per month starting from January to December"));
+    .json(new ApiResponse(200, [year, monthlyCounts] , "Active users year and per month starting from January to December"));
 });
 
 export {
