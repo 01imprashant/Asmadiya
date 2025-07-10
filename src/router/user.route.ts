@@ -14,6 +14,6 @@ router.route("/register").post(
 
 router.route("/login").post(logInUser) 
 router.route("/logout").post(verifyJWT,logOutUser) 
-router.route("/active").get(verifyJWT, activeUsersByMonth)
+router.route("/active-users").get(verifyJWT, activeUsersByMonth)
 
 export default router;
