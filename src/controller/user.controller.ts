@@ -171,6 +171,7 @@ const getUserProfile = asyncHandler(async(req, res) => {
 
 
 const activeUsersByMonth = asyncHandler(async(req, res) => {
+    // get year from request body
     const { year } = req.body;
 
     // Validate year (optional range logic)
@@ -226,7 +227,7 @@ const companyProfit = asyncHandler(async(req, res) => {
     const profit = Math.floor(Math.random() * 100000); 
     return res
     .status(200)    
-    .json(new ApiResponse(200, profit, "Company profit fetched successfully"));
+    .json(new ApiResponse(200, [12, 23, 45, 78, 24, 68, 45, 23, 23, 35], "Company profit fetched successfully"));
 });
 
 
