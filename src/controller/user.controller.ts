@@ -223,11 +223,13 @@ const activeUsersByMonth = asyncHandler(async(req, res) => {
 
 
 const companyProfit = asyncHandler(async(req, res) => {
-    // Placeholder for company profit logic
-    const profit = Math.floor(Math.random() * 100000); 
+    let profit = [];
+    for(let i=0; i<12; i++){
+        profit.push(Math.floor(Math.random() * 10000));
+    }
     return res
     .status(200)    
-    .json(new ApiResponse(200, [12, 23, 45, 78, 24, 68, 45, 23, 23, 35], "Company profit fetched successfully"));
+    .json(new ApiResponse(200, profit, "Company profit fetched successfully"));
 });
 
 
@@ -270,7 +272,9 @@ const resetPassword = asyncHandler(async(req, res) => {
         .status(404)
         .json(new ApiError(404, " ", false, null, "User not found"));
     }
+
     const isPasswordMatched = await bcrypt.compare(oldPassword, user.password);
+    
     if(!isPasswordMatched){
         return res
         .status(401)

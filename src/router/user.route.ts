@@ -14,9 +14,9 @@ router.route("/register").post(
 
 router.route("/login").post(logInUser) 
 router.route("/logout").post(verifyJWT,logOutUser) 
-router.route("/active-users").get(verifyJWT, activeUsersByMonth)
+router.route("/active-users").post(verifyJWT, activeUsersByMonth)
 router.route("/profile").get(verifyJWT, getUserProfile)
-router.route("/company-profit").get(verifyJWT, companyProfit)
+router.route("/company-profit").post(verifyJWT, companyProfit)
 router.route("/forgot-password").post(forgotPassword)
 router.route("/reset-password").post(verifyJWT, resetPassword)
 
