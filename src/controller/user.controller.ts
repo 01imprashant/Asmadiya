@@ -225,7 +225,7 @@ const activeUsersByMonth = asyncHandler(async(req, res) => {
 const companyProfit = asyncHandler(async(req, res) => {
     let profit = [];
     for(let i=0; i<12; i++){
-        profit.push(Math.floor(Math.random() * 10000));
+        profit.push(Math.floor(Math.random() * 100));
     }
     return res
     .status(200)    
@@ -235,14 +235,19 @@ const companyProfit = asyncHandler(async(req, res) => {
 
 const forgotPassword = asyncHandler(async(req, res) => {
     // Placeholder for forgot password logic
-    const { email } = req.body;
-    if(!email){
+    const { emailOrPhone } = req.body;
+    if(!emailOrPhone){
         return res
         .status(400)
-        .json(new ApiError(400, " ", false, null, "Email is required"));
+        .json(new ApiError(400, " ", false, null, "Email or phone is required"));
     }
     // Logic to handle forgot password
-    const user = await User.findOne({ email });
+    const user = await User.findOne({
+        $or:[
+            { email: emailOrPhone },
+            { phone: emailOrPhone },
+        ]
+    });    
     if(!user){  
         return res
         .status(404)

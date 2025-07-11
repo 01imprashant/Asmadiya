@@ -13,7 +13,7 @@ router.route("/register").post(
 )
 
 router.route("/login").post(logInUser) 
-router.route("/logout").get(verifyJWT,logOutUser) 
+router.route("/logout").post(verifyJWT,logOutUser) 
 router.route("/active-users").post(verifyJWT, activeUsersByMonth)
 router.route("/profile").get(verifyJWT, getUserProfile)
 router.route("/company-profit").get(verifyJWT, companyProfit)
