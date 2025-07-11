@@ -3,7 +3,6 @@ import ApiError from "../utils/ApiError";
 import ApiResponse from "../utils/ApiResponse";
 import { User } from "../model/user.model";
 import { uploadOnCloudinary }  from "../utils/cloudinary";
-import { verifyJWT } from "../middleware/auth.middleware";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import 'dotenv/config';
@@ -222,11 +221,76 @@ const activeUsersByMonth = asyncHandler(async(req, res) => {
 });
 
 
+const companyProfit = asyncHandler(async(req, res) => {
+    // Placeholder for company profit logic
+    const profit = Math.floor(Math.random() * 100000); 
+    return res
+    .status(200)    
+    .json(new ApiResponse(200, profit, "Company profit fetched successfully"));
+});
+
+
+const forgotPassword = asyncHandler(async(req, res) => {
+    // Placeholder for forgot password logic
+    const { email } = req.body;
+    if(!email){
+        return res
+        .status(400)
+        .json(new ApiError(400, " ", false, null, "Email is required"));
+    }
+    // Logic to handle forgot password
+    const user = await User.findOne({ email });
+    if(!user){  
+        return res
+        .status(404)
+        .json(new ApiError(404, " ", false, null, "User not found"));
+    }
+    // Here you would typically send a reset password email
+    // For now, we will just return a success message
+    return res
+    .status(200)
+    .json(new ApiResponse(200, null, "Password reset link sent to your email"));
+});
+
+
+const resetPassword = asyncHandler(async(req, res) => {
+    // Placeholder for reset password logic
+    const {oldPassword, newPassword} = req.body;
+    if(!oldPassword || !newPassword){
+        return res
+        .status(400)
+        .json(new ApiError(400, " ", false, null, "Old password and new password are required"));
+    }
+    // Logic to reset password
+    const userId = (req as any).user._id;
+    const user = await User.findById(userId);
+    if(!user){
+        return res
+        .status(404)
+        .json(new ApiError(404, " ", false, null, "User not found"));
+    }
+    const isPasswordMatched = await bcrypt.compare(oldPassword, user.password);
+    if(!isPasswordMatched){
+        return res
+        .status(401)
+        .json(new ApiError(401, " ", false, null, "Old password is incorrect"));
+    }
+    user.password = await newPassword;
+    await user.save();
+    return res
+    .status(200)
+    .json(new ApiResponse(200, null, "Password reset successfully"));
+}); 
+
 
 export {
     registerUser,
     logInUser,
     logOutUser,
     activeUsersByMonth,
-    getUserProfile
+    getUserProfile,
+    companyProfit,
+    forgotPassword,
+    resetPassword
+
 }

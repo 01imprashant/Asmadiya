@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { registerUser,logInUser, logOutUser, activeUsersByMonth, getUserProfile } from "../controller/user.controller";
+import { registerUser,logInUser, logOutUser, activeUsersByMonth, getUserProfile, companyProfit, forgotPassword, resetPassword } from "../controller/user.controller";
 import { upload } from "../middleware/multer.middleware";
 import { verifyJWT } from "../middleware/auth.middleware";
 
@@ -16,5 +16,8 @@ router.route("/login").post(logInUser)
 router.route("/logout").post(verifyJWT,logOutUser) 
 router.route("/active-users").get(verifyJWT, activeUsersByMonth)
 router.route("/profile").get(verifyJWT, getUserProfile)
+router.route("/company-profit").get(verifyJWT, companyProfit)
+router.route("/forgot-password").post(forgotPassword)
+router.route("/reset-password").post(verifyJWT, resetPassword)
 
 export default router;
