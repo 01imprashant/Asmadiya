@@ -248,11 +248,16 @@ const forgotPassword = asyncHandler(async(req, res) => {
         .status(404)
         .json(new ApiError(404, " ", false, null, "User not found"));
     }
-    // Here you would typically send a reset password email
-    // For now, we will just return a success message
+
+    let passwordReset = "";
+
+    for(let i=0; i<5; i++){
+        passwordReset += Math.floor(Math.random() * 10);
+    }
+    console.log(passwordReset)
     return res
     .status(200)
-    .json(new ApiResponse(200, null, "Password reset link sent to your email"));
+    .json(new ApiResponse(200, passwordReset, "Password reset link sent to your email"));
 });
 
 
@@ -274,7 +279,7 @@ const resetPassword = asyncHandler(async(req, res) => {
     }
 
     const isPasswordMatched = await bcrypt.compare(oldPassword, user.password);
-    
+
     if(!isPasswordMatched){
         return res
         .status(401)
