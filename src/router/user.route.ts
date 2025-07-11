@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { registerUser,logInUser, logOutUser, activeUsersByMonth } from "../controller/user.controller";
+import { registerUser,logInUser, logOutUser, activeUsersByMonth, getUserProfile } from "../controller/user.controller";
 import { upload } from "../middleware/multer.middleware";
 import { verifyJWT } from "../middleware/auth.middleware";
 
@@ -15,5 +15,6 @@ router.route("/register").post(
 router.route("/login").post(logInUser) 
 router.route("/logout").post(verifyJWT,logOutUser) 
 router.route("/active-users").get(verifyJWT, activeUsersByMonth)
+router.route("/profile").get(verifyJWT, getUserProfile)
 
 export default router;

@@ -3,24 +3,10 @@ import ApiError from "../utils/ApiError";
 import ApiResponse from "../utils/ApiResponse";
 import { User } from "../model/user.model";
 import { uploadOnCloudinary }  from "../utils/cloudinary";
+import { verifyJWT } from "../middleware/auth.middleware";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import 'dotenv/config';
-
-
-// const generateAccessTokenAndRefreshToken =  async(userId:string) => {
-//     try {
-//         const user = await User.findById(userId);
-//         const accessToken = user.generateAccessToken();
-//         const refreshToken = user.generateRefreshToken();
-
-//         user.refreshToken = refreshToken;
-//         await user.save({ validateBeforeSave: false });
-//         return { accessToken}
-//     } catch (error) {
-//         throw new ApiError(500, "Error while generating tokens")
-//     }
-// }
 
 
 const registerUser = asyncHandler(async(req, res) => {
@@ -165,45 +151,82 @@ const logOutUser = asyncHandler(async(req, res) => {
     .json(new ApiResponse(200, null, "User LoggedOut Successfully"))
 });
 
-const activeUsersByMonth = asyncHandler(async(req, res) => {
-       // Get the current year
-       const year = new Date().getFullYear();
-       // Aggregate users by month of creation
-       const usersByMonth = await User.aggregate([
-           {
-               $match: {
-                   createdAt: {
-                       $gte: new Date(`${year}-01-01T00:00:00.000Z`),
-                       $lt: new Date(`${year + 1}-01-01T00:00:00.000Z`)
-                   }
-               }
-           },
-           {
-               $group: {
-                   _id: { $month: "$createdAt" },
-                   count: { $sum: 1 }
-               }
-           }
-       ]);
-   
-       // Initialize array with 12 zeros (for each month)
-       const monthlyCounts = Array(12).fill(0);
-   
-       // Fill in the counts from aggregation
-       usersByMonth.forEach(item => {
-           // MongoDB months are 1-indexed (Jan=1), JS arrays are 0-indexed
-           monthlyCounts[item._id - 1] = item.count;
-       });
 
-       
-    return res.
-    status(200)
-    .json(new ApiResponse(200, [year, monthlyCounts] , "Active users year and per month starting from January to December"));
+const getUserProfile = asyncHandler(async(req, res) => {
+    // get user id from request
+    const userId = (req as any).user._id;
+    // find user in db
+    const user = await User.findById(userId).select("-password");
+    // if user not found
+    if(!user){
+        // throw new ApiError(404, "User not found");
+        return res
+        .status(404)
+        .json(new ApiError(404, " ", false, null, "User not found"));
+    }
+    // return response
+    return res
+    .status(200)
+    .json(new ApiResponse(200, user, "User Profile Fetched Successfully"));
 });
+
+
+const activeUsersByMonth = asyncHandler(async(req, res) => {
+    const { year } = req.body;
+
+    // Validate year (optional range logic)
+    if (!year || typeof year !== "number" || year < 2020 || year > new Date().getFullYear()) {
+        return res
+        .status(400)
+        .json(new ApiError(400, "Invalid year", false, null, "Year must be a valid number between 2020 and current year."));
+    }
+
+    // Count total users to check if DB is empty
+    const totalUsers = await User.countDocuments();
+    if (totalUsers === 0) {
+        return res
+        .status(200)
+        .json(new ApiResponse(200, Array(12).fill(0), "No users found in database"));
+    }
+
+    // Aggregate users created in the given year, grouped by month
+    const usersByMonth = await User.aggregate([
+        {
+            $match: {
+                createdAt: {
+                    $gte: new Date(`${year}-01-01T00:00:00.000Z`),
+                    $lt: new Date(`${year + 1}-01-01T00:00:00.000Z`)
+                }
+            }
+        },
+        {
+            $group: {
+                _id: { $month: "$createdAt" },
+                count: { $sum: 1 }
+            }
+        },
+        {
+            $sort: { "_id": 1 }
+        }
+    ]);
+
+    // Fill the monthlyCounts array (index 0 = Jan, 11 = Dec)
+    const monthlyCounts = Array(12).fill(0);
+    usersByMonth.forEach(item => {
+        monthlyCounts[item._id - 1] = item.count;
+    });
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, monthlyCounts, "Active users per month from January to December"));
+});
+
+
 
 export {
     registerUser,
     logInUser,
     logOutUser,
     activeUsersByMonth,
+    getUserProfile
 }
