@@ -1,5 +1,5 @@
 # Use official Node.js LTS image
-FROM node:18
+FROM node:20
 
 # Set working directory
 WORKDIR /app
@@ -18,4 +18,4 @@ COPY . .
 EXPOSE 3000
 
 # Start the app (using ts-node for dev, or node dist for prod)
-CMD ["npx", "ts-node", "src/index.ts"]
+CMD ["npm", "start"]
