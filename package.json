@@ -19,6 +19,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.16.2",
     "multer": "^2.0.1",
+    "nodemailer": "^7.0.5",
     "typescript": "^5.8.3"
   },
   "devDependencies": {
@@ -27,6 +28,7 @@
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.0.0",
+    "@types/nodemailer": "^6.4.17",
     "nodemon": "^3.1.10",
     "prettier": "^3.6.2",
     "ts-node": "^10.9.2"
