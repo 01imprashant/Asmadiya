@@ -31,6 +31,6 @@ router.route("/company-profit").get(verifyJWT, companyProfit)
 router.route("/total-users").get(verifyJWT, totalUsers)
 router.route("/total-social-media-users").get(verifyJWT, totalSocialMediaUsers)
 router.route("/forgot-password").post(forgotPassword)
-router.route("/reset-password").post(verifyJWT, resetPassword)
+router.route("/reset-password").post(resetPassword)
 
 export default router;
