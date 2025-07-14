@@ -1,6 +1,7 @@
 import asyncHandler from "../utils/asyncHandler";
 import ApiError from "../utils/ApiError";
 import ApiResponse from "../utils/ApiResponse";
+import sendMail from "../utils/sendMail";
 import { User } from "../model/user.model";
 import { uploadOnCloudinary }  from "../utils/cloudinary";
 import bcrypt from "bcrypt";
@@ -317,8 +318,11 @@ const forgotPassword = asyncHandler(async(req, res) => {
     console.log(`Generated OTP for ${email}: ${otp}`);
     user.otp = otp;
     user.otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
-    await user.save();  
-    // send otp to user email
+    await user.save(); 
+    // Send OTP to user's email
+    const subject = "Password Reset OTP";
+    const Message = `Your OTP is ${otp}`;
+    await sendMail(email, subject, Message);
     return res
     .status(200)
     .json(new ApiResponse(200, "", "OTP sent to user email successfully"));
@@ -328,8 +332,8 @@ const forgotPassword = asyncHandler(async(req, res) => {
 
 const resetPassword = asyncHandler(async(req, res) => {
     // Placeholder for reset password logic
-    const { email, otp, newPassword, confirmPassword } = req.body;
-    if(!email || !otp || !newPassword || !confirmPassword){
+    const { otp, newPassword, confirmPassword } = req.body;
+    if(!otp || !newPassword || !confirmPassword){
         return res
         .status(400)
         .json(new ApiError(400, "", false, null, "All fields are required"));
@@ -341,12 +345,12 @@ const resetPassword = asyncHandler(async(req, res) => {
         .json(new ApiError(400, "", false, null, "New password and confirm password must be same"));
     }
     // Find user by email and OTP
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ otp });
 
     if (!user || user.otp !== otp) {
         return res
         .status(400)
-        .json(new ApiError(400, "", false, null, "Invalid OTP or email"));
+        .json(new ApiError(400, "", false, null, "Invalid OTP "));
     }
 
     if (!user.otpExpiry || user.otpExpiry < new Date()) {
